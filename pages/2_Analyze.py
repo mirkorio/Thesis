@@ -129,6 +129,22 @@ if st.session_state.df is not None:
 
         st.dataframe(styled_filtered_df)
 
+         # Summary for "Filtered Data"
+        with st.expander("Summary of Filtered Data"):
+            filtered_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']] = filtered_df[
+                ['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']].round(2)
+
+            def count_by_similarity_range(df):
+                return {
+                    'Blue (0%)': df[df['Weighted_Similarity_%'] == 0].shape[0],
+                    'Green (1% - 24%)': df[df['Weighted_Similarity_%'].between(1, 24)].shape[0],
+                    'Yellow (25% - 49%)': df[df['Weighted_Similarity_%'].between(25, 49)].shape[0],
+                    'Orange (50% - 74%)': df[df['Weighted_Similarity_%'].between(50, 74)].shape[0],
+                    'Red (75% - 100%)': df[df['Weighted_Similarity_%'] >= 75].shape[0]
+                }
+
+            filtered_data_summary = count_by_similarity_range(filtered_df)
+            st.write(filtered_data_summary)
         # Enhanced visualizations with custom themes and layering
         st.subheader('Text Similarity & Structural Similarity')
 
@@ -188,6 +204,23 @@ if st.session_state.df is not None:
 
         # Display the styled filtered dataframe
         st.dataframe(styled_filtered_overall_similarity)
+
+        # Summary for "Each code's Average Similarity Scores"
+        with st.expander("Summary of Each code's Average Similarity Scores"):
+
+            overall_similarity = df.groupby('Code1').agg(
+                average_text_similarity=('Text_Similarity_%', 'mean'),
+                average_structural_similarity=('Structural_Similarity_%', 'mean'),
+                average_weighted_similarity=('Weighted_Similarity_%', 'mean')
+            ).reset_index()
+
+            overall_similarity[['average_weighted_similarity', 'average_text_similarity', 'average_structural_similarity']] = overall_similarity[
+                ['average_weighted_similarity', 'average_text_similarity', 'average_structural_similarity']].round(2)
+
+            overall_similarity = overall_similarity.sort_values(by='average_weighted_similarity', ascending=False)
+
+            filtered_overall_summary = count_by_similarity_range(overall_similarity.rename(columns={'average_weighted_similarity': 'Weighted_Similarity_%'}))
+            st.write(filtered_overall_summary)
 
         st.subheader('Histograms of Similarity Metrics')
 
