@@ -207,17 +207,27 @@ if st.session_state.df is not None:
         st.altair_chart(bar_chart, use_container_width=True)
 
         st.subheader('Histograms of Similarity Metrics')
+
+        # Define the custom color scale based on the similarity score thresholds
+        color_scale = alt.Scale(
+            domain=[0, 1, 25, 50, 75, 100],
+            range=['#6A9AB0', '#557C56', '#EEDF7A', '#D8A25E', '#A04747']  # Blue, Green, Yellow, Orange, Red
+        )
+
         for column in ['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']:
             hist_chart = alt.Chart(filtered_df).mark_bar().encode(
                 alt.X(column, bin=alt.Bin(maxbins=30), title=column.replace('_', ' ').title()),
                 y=alt.Y('count()', title='Frequency'),
+                color=alt.Color(column, scale=color_scale, legend=None),  # Apply color based on similarity score
                 tooltip=[column, 'count()']
             ).properties(
                 width=300,
                 height=300,
                 title=f'Distribution of {column.replace("_", " ").title()}'
             )
+            
             st.altair_chart(hist_chart, use_container_width=True)
+
 
         # Download button for filtered data in the sidebar
         st.sidebar.download_button(
