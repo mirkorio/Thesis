@@ -298,9 +298,6 @@ if st.session_state.df is not None:
         # After calculating overall_similarity and displaying it
         st.subheader("Each Code's Average Similarity Scores")
 
-        # Display the overall similarity DataFrame
-        st.dataframe(styled_filtered_overall_similarity)
-
         # Generate a summary report based on average similarity scores
         average_highest_weighted_sim = overall_similarity['average_weighted_similarity'].max()
         average_lowest_weighted_sim = overall_similarity['average_weighted_similarity'].min()
