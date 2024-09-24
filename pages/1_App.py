@@ -8,15 +8,14 @@ import multiprocessing
 
 def main():
     st.set_page_config(
-        page_title="App",
+        page_title="Code Similarity Detection and Clustering",
         page_icon="logo/logo.png",  # Set your logo image as the page icon
     )
-    st.markdown("<h3 style='text-align: center; margin: 20px;'>Code Similarity Detection and Clustering</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center;'>Code Similarity Detection and Clustering</h3>", unsafe_allow_html=True)
 
-    # Adding an introductory section with markdown
     st.markdown("""
-    This application enables you to detect and analyze code similarity by uploading Python files. 
-    Get started by uploading your files to explore clustered similarity results, visualizations, and detailed comparisons.
+    This application allows you to detect and analyze code similarity by uploading Python files. 
+    Get started by uploading your files and exploring clustered similarity results, visualizations, and detailed comparisons.
     """)
 
     # Text input for activity title
@@ -37,7 +36,9 @@ def main():
 
     if 'silhouette_avg' not in st.session_state:
         st.session_state.silhouette_avg = None
-        
+
+    if 'silhouette_data' not in st.session_state:
+        st.session_state.silhouette_data = pd.DataFrame()
 
     if 'extracted_files_content' not in st.session_state:
         st.session_state.extracted_files_content = {}
@@ -67,7 +68,7 @@ def main():
                 pool.join()
 
                 try:
-                    # Adjust the similarity values to be percentages and rename columns
+                    # Convert similarity values to percentages and display with 2 decimal places
                     similarity_df = pd.DataFrame(results, columns=['Code1', 'Code2', 'Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%'])
                     similarity_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']] = similarity_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']].apply(lambda x: round(x * 100, 2))
                     st.session_state.similarity_df = similarity_df
@@ -82,7 +83,7 @@ def main():
     if 'similarity_df' in st.session_state and not st.session_state.similarity_df.empty:
         st.header("Similarity Results")
         
-        # **Display dataframe with two decimal places and % sign**
+        # Display dataframe with two decimal places and % sign
         df_display = st.session_state.similarity_df.copy()
         df_display[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']] = df_display[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']].applymap(lambda x: f"{x:.2f}%")
         st.dataframe(df_display)
@@ -90,7 +91,7 @@ def main():
         # Clustering
         if st.button("Perform Clustering"):
             with st.spinner("Performing clustering..."):
-                # Calculate the elbow method automatically
+                # Calculate the elbow method
                 clusterer = CodeClusterer(num_clusters=st.session_state.best_num_clusters)
                 clusterer.load_data(st.session_state.similarity_df)
                 clusterer.calculate_elbow(max_clusters=10)
@@ -104,6 +105,7 @@ def main():
                     features = clusterer.cluster_codes()
                     st.session_state.clustered_data = clusterer.get_clustered_data()
                     st.session_state.silhouette_avg = clusterer.silhouette_avg
+                    st.session_state.silhouette_data = clusterer.get_silhouette_data(features)
                     st.session_state.clustering_performed = True
 
                     st.success("Clustering complete!")
@@ -135,10 +137,9 @@ def main():
             st.altair_chart(cluster_chart, use_container_width=True)
 
             # Display Silhouette Plot and Scores
-            if 'clustered_data' in st.session_state and 'features' in locals():
+            if 'silhouette_data' in st.session_state and not st.session_state.silhouette_data.empty:
                 st.header("Silhouette Plot")
-                silhouette_data = clusterer.get_silhouette_data(features)
-                silhouette_chart = alt.Chart(silhouette_data).mark_bar().encode(
+                silhouette_chart = alt.Chart(st.session_state.silhouette_data).mark_bar().encode(
                     x='Silhouette Value',
                     y='Cluster:N',
                     color='Cluster:N',
