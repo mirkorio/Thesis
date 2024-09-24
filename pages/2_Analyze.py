@@ -219,7 +219,7 @@ if st.session_state.df is not None:
             )
             st.altair_chart(hist_chart, use_container_width=True)
 
-        st.subheader('Pair Plot of Similarity Metrics')
+        '''st.subheader('Pair Plot of Similarity Metrics')
         pair_plot = alt.Chart(filtered_df).mark_circle(size=60).encode(
             x=alt.X(alt.repeat("column"), type='quantitative', title=None),
             y=alt.Y(alt.repeat("row"), type='quantitative', title=None),
@@ -233,7 +233,7 @@ if st.session_state.df is not None:
             column=['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']
         ).interactive()
 
-        st.altair_chart(pair_plot, use_container_width=True)
+        st.altair_chart(pair_plot, use_container_width=True)'''
 
         # Download button for filtered data in the sidebar
         st.sidebar.download_button(
