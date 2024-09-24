@@ -37,9 +37,7 @@ def main():
 
     if 'silhouette_avg' not in st.session_state:
         st.session_state.silhouette_avg = None
-
-    if 'silhouette_data' not in st.session_state:
-        st.session_state.silhouette_data = pd.DataFrame()
+        
 
     if 'extracted_files_content' not in st.session_state:
         st.session_state.extracted_files_content = {}
@@ -137,9 +135,10 @@ def main():
             st.altair_chart(cluster_chart, use_container_width=True)
 
             # Display Silhouette Plot and Scores
-            if 'silhouette_data' in st.session_state and not st.session_state.silhouette_data.empty:
+            if 'clustered_data' in st.session_state and 'features' in locals():
                 st.header("Silhouette Plot")
-                silhouette_chart = alt.Chart(st.session_state.silhouette_data).mark_bar().encode(
+                silhouette_data = clusterer.get_silhouette_data(features)
+                silhouette_chart = alt.Chart(silhouette_data).mark_bar().encode(
                     x='Silhouette Value',
                     y='Cluster:N',
                     color='Cluster:N',
