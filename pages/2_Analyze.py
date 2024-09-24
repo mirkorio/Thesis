@@ -130,7 +130,7 @@ if st.session_state.df is not None:
         st.dataframe(styled_filtered_df)
 
         # Enhanced visualizations with custom themes and layering
-        st.subheader('Text Similarity vs Structural Similarity')
+        st.subheader('Text Similarity & Structural Similarity')
 
         # Define the custom color scale based on Weighted_Similarity_% thresholds
         color_scale = alt.Scale(
