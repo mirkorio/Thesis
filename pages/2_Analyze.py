@@ -98,7 +98,7 @@ if st.session_state.df is not None:
         ]
 
         # Display filtered dataframe with formatted similarity columns
-        st.write("Filtered Data")
+        st.subheader("Filtered Data")
         # Expander for Color Labels Explanation with styled text
         with st.expander("Color Labels Explanation"):
             st.markdown("""
@@ -190,21 +190,6 @@ if st.session_state.df is not None:
 
         # Display the styled filtered dataframe
         st.dataframe(styled_filtered_overall_similarity)
-
-        st.subheader('Number of Code Pairs in Each Cluster')
-        cluster_count = filtered_df['Cluster'].value_counts().reset_index()
-        cluster_count.columns = ['Cluster', 'Count']
-        bar_chart = alt.Chart(cluster_count).mark_bar().encode(
-            x=alt.X('Cluster:N', title='Cluster'),
-            y=alt.Y('Count:Q', title='Number of Code Pairs'),
-            color='Cluster:N',
-            tooltip=['Cluster', 'Count']
-        ).properties(
-            width=800,
-            height=400
-        )
-
-        st.altair_chart(bar_chart, use_container_width=True)
 
         st.subheader('Histograms of Similarity Metrics')
 
