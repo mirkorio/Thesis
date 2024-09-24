@@ -151,9 +151,7 @@ if st.session_state.df is not None:
         st.altair_chart(scatter_plot, use_container_width=True)
 
         # Calculate and display overall similarity for each code
-        st.write("""
-        Each code's Average Similarity Scores
-        """)
+        st.subheader("""Each code's Average Similarity Scores""")
 
         # Calculate the overall/average similarity metrics for each code
         overall_similarity = df.groupby('Code1').agg(
