@@ -219,6 +219,68 @@ if st.session_state.df is not None:
             file_name='filtered_data.csv',
             mime='text/csv'
         )
+
+        # After displaying the overall summary and statistics
+        st.subheader('Summary Report')
+
+        # Generate a summary report based on the overall dataset
+        highest_weighted_sim = df['Weighted_Similarity_%'].max()
+        lowest_weighted_sim = df['Weighted_Similarity_%'].min()
+        average_weighted_sim = df['Weighted_Similarity_%'].mean()
+
+        st.markdown(f"""
+        - **Highest Weighted Similarity**: {highest_weighted_sim:.2f}%
+        - **Lowest Weighted Similarity**: {lowest_weighted_sim:.2f}%
+        - **Average Weighted Similarity**: {average_weighted_sim:.2f}%
+        """)
+
+        # After displaying the filtered data
+        st.subheader('Filtered Data Report')
+
+        # Generate a message based on the filtered data
+        if not filtered_df.empty:
+            filtered_highest_weighted_sim = filtered_df['Weighted_Similarity_%'].max()
+            filtered_lowest_weighted_sim = filtered_df['Weighted_Similarity_%'].min()
+            filtered_average_weighted_sim = filtered_df['Weighted_Similarity_%'].mean()
+            
+            st.markdown(f"""
+            - **Filtered Highest Weighted Similarity**: {filtered_highest_weighted_sim:.2f}%
+            - **Filtered Lowest Weighted Similarity**: {filtered_lowest_weighted_sim:.2f}%
+            - **Filtered Average Weighted Similarity**: {filtered_average_weighted_sim:.2f}%
+            """)
+        else:
+            st.warning('No data matches the selected filters.')
+
+        # After the scatter plot visualization
+        st.subheader('Scatter Plot Insights')
+
+        # Report on the scatter plot data
+        max_similarity_pair = filtered_df.loc[filtered_df['Weighted_Similarity_%'].idxmax(), ['Code1', 'Code2']]
+        min_similarity_pair = filtered_df.loc[filtered_df['Weighted_Similarity_%'].idxmin(), ['Code1', 'Code2']]
+
+        st.markdown(f"""
+        - **Highest similarity pair**: {max_similarity_pair['Code1']} and {max_similarity_pair['Code2']} 
+        with a weighted similarity of {filtered_highest_weighted_sim:.2f}%.
+        - **Lowest similarity pair**: {min_similarity_pair['Code1']} and {min_similarity_pair['Code2']} 
+        with a weighted similarity of {filtered_lowest_weighted_sim:.2f}%.
+        """)
+
+        # After the histogram section
+        st.subheader('Histogram Insights')
+
+        # Generate a report based on the histogram data
+        most_common_range = (
+            filtered_df['Weighted_Similarity_%']
+            .value_counts(bins=[0, 25, 50, 75, 100])
+            .idxmax()
+        )
+        most_common_range_text = f"{most_common_range.left:.0f}% - {most_common_range.right:.0f}%"
+
+        st.markdown(f"""
+        - **Most common weighted similarity range**: {most_common_range_text}
+        (the most frequent range of weighted similarity scores).
+        """)
+
     else:
         st.error('The uploaded file does not contain the required columns.')
 else:
