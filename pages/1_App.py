@@ -38,9 +38,6 @@ def main():
     if 'silhouette_avg' not in st.session_state:
         st.session_state.silhouette_avg = None
 
-    if 'davies_bouldin' not in st.session_state:
-        st.session_state.davies_bouldin = None
-
     if 'extracted_files_content' not in st.session_state:
         st.session_state.extracted_files_content = {}
 
@@ -106,7 +103,6 @@ def main():
                     features = clusterer.cluster_codes()
                     st.session_state.clustered_data = clusterer.get_clustered_data()
                     st.session_state.silhouette_avg = clusterer.silhouette_avg
-                    st.session_state.davies_bouldin = clusterer.davies_bouldin
                     st.session_state.clustering_performed = True
 
                     st.success("Clustering complete!")
@@ -149,7 +145,6 @@ def main():
                 ).interactive()
                 st.altair_chart(silhouette_chart, use_container_width=True)
                 st.write(f"Silhouette Score: {st.session_state.silhouette_avg:.4f}")
-                st.write(f"Davies-Bouldin Index: {st.session_state.davies_bouldin:.4f}")
 
             # Display Clustered codes from highest to lowest weighted similarity
             st.header("Clustered Codes")
