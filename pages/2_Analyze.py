@@ -295,6 +295,42 @@ if st.session_state.df is not None:
         with a weighted similarity of {filtered_lowest_weighted_sim:.2f}%.
         """)
 
+        # After calculating overall_similarity and displaying it
+        st.subheader("Each Code's Average Similarity Scores")
+
+        # Display the overall similarity DataFrame
+        st.dataframe(styled_filtered_overall_similarity)
+
+        # Generate a summary report based on average similarity scores
+        average_highest_weighted_sim = overall_similarity['average_weighted_similarity'].max()
+        average_lowest_weighted_sim = overall_similarity['average_weighted_similarity'].min()
+        average_average_weighted_sim = overall_similarity['average_weighted_similarity'].mean()
+
+        # Count codes in average similarity categories
+        average_count_blue = len(overall_similarity[overall_similarity['average_weighted_similarity'] == 0])
+        average_count_green = len(overall_similarity[(overall_similarity['average_weighted_similarity'] >= 1) & 
+                                                    (overall_similarity['average_weighted_similarity'] < 25)])
+        average_count_yellow = len(overall_similarity[(overall_similarity['average_weighted_similarity'] >= 25) & 
+                                                    (overall_similarity['average_weighted_similarity'] < 50)])
+        average_count_orange = len(overall_similarity[(overall_similarity['average_weighted_similarity'] >= 50) & 
+                                                    (overall_similarity['average_weighted_similarity'] < 75)])
+        average_count_red = len(overall_similarity[overall_similarity['average_weighted_similarity'] >= 75])
+
+        # Summary report
+        st.markdown(f"""
+        - **Average Highest Weighted Similarity**: {average_highest_weighted_sim:.2f}%
+        - **Average Lowest Weighted Similarity**: {average_lowest_weighted_sim:.2f}%
+        - **Average Overall Weighted Similarity**: {average_average_weighted_sim:.2f}%
+
+        - **Total Codes**: {len(overall_similarity)}
+            - **Blue (0% similarity)**: {average_count_blue}
+            - **Green (1% - 24% very low similarity)**: {average_count_green}
+            - **Yellow (25% - 49% low similarity)**: {average_count_yellow}
+            - **Orange (50% - 74% mid similarity)**: {average_count_orange}
+            - **Red (75% - 100% high similarity)**: {average_count_red}
+        """)
+
+
         # After the histogram section
         st.subheader('Histogram Insights')
 
