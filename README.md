@@ -15,8 +15,7 @@ You can access the live application [**here**](https://thesis-roqzofhqframgkykcz
 - Start by entering a title for the current code activity. This will be used as the filename for downloading the results later.
 
 2. **📁 Upload Python Files**:
-- Upload individual Python files or a ZIP archive containing multiple Python files.
-- Click the **"Upload"** button to process the files.
+- Upload Python files by clicking the **"Browse files"** button or **"Drag and Drop files"** in the Upload Python Files section.
 
 3. **🔄 Process Files**:
 - The app will automatically process the uploaded files, performing similarity analysis and clustering preparation.
