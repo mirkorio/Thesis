@@ -45,58 +45,81 @@ def run():
     )
     st.write("---")
     
-    # Expander for Step-by-Step Guide
-    with st.expander("Instructions"):
+    import streamlit as st
+
+    # Expander for Instructions
+    with st.expander("📖 Instructions"):
         st.markdown("""
-        ### **App: Code Similarity Detection and Clustering**
 
-        1. **Launch the Application**:  
-        Open the application to begin detecting and clustering code similarity.
+        ## 📖 Step-by-Step Guide
 
-        2. **Upload Python Files**:  
+        ### App: Code Similarity Detection and Clustering 
+
+        ---
+        
+        1. **📝 Enter a Title for the Code Activity**:
+        - Start by entering a title for the current code activity. This will be used as the filename for downloading the results later.
+
+        2. **📁 Upload Python Files**:
         - Upload individual Python files or a ZIP archive containing multiple Python files.
-        - Click the "Upload" button to process the files.
+        - Click the **"Upload"** button to process the files.
 
-        3. **Analyze Similarity**:  
-        - The app will analyze the **Text Similarity** and **Structural Similarity** between the files.
-        - Once processed, you will see various visualizations:
-            - **Elbow Chart**: Helps determine the optimal number of clusters.
-            - **Silhouette Plot**: Shows the silhouette score for clustering.
+        3. **🔄 Process Files**:
+        - The app will automatically process the uploaded files, performing similarity analysis and clustering preparation.
 
-        4. **View Clustering Results**:  
-        - The clustered files will be displayed, sorted by **Weighted Similarity** (a combination of text and structural similarity).
-        - You can view a **Scatter Plot** of the clustered files and select two files for side-by-side comparison.
+        4. **📊 View Similarity Results**:
+        - After the files are processed, you will see the similarity metrics:
+            - **Text Similarity**
+            - **Structural Similarity**
+            - **Weighted Similarity** (a combination of the text and structural similarity)
 
-        5. **Download the Results**:  
-        - Once the clustering is complete, you can download a CSV file that includes:
-            - `Code1`, `Code2`
-            - `Text_Similarity_%`, `Structural_Similarity_%`, and `Weighted_Similarity_%`
-            - `Cluster` (cluster assignment for each pair)
-        - Click the **Download CSV** button to save the file to your device.
+        5. **🔍 Perform Clustering**:
+        - The next step is to cluster the files based on the calculated similarities.
+        - The app will automatically apply clustering using the **K-Means** algorithm.
 
+        6. **📊 View Results**:
+        - Once clustering is complete, various visualizations and metrics will be displayed:
+            - **Elbow Method**: Helps you determine the optimal number of clusters.
+            - **Best Number of Clusters**: Displays the best number of clusters found.
+            - **Scatter Plot**: Visualizes the clustered codes.
+            - **Silhouette Plot**: Shows the silhouette scores for clustering.
+            - **Silhouette Score**: Quantifies how well the clusters are formed.
+            - **Clustered Codes**: Lists the codes grouped by their clusters.
+            - **Side-by-Side Code Comparison**: Compare two selected codes within the same cluster.
 
-        ### **Analyze: Clustered Code Similarity Analysis**
+        7. **💾 Download Clustered Codes**:
+        - After reviewing the results, click the **Download CSV** button to save the clustered codes, including:
+            - **Code1**, **Code2**
+            - **Text Similarity %**, **Structural Similarity %**, and **Weighted Similarity %**
+            - **Cluster** (cluster assignment for each pair)
 
-        1. **Upload the CSV File**:  
-        - Open the **Clustered Code Similarity Analysis** section of the app.
-        - Upload the CSV file that was generated from the **Code Similarity Detection and Clustering** step.
+        ---
 
-        2. **View and Explore the Data**:  
-        - The uploaded CSV data will be displayed.
-        - Use the **filters in the sidebar** to explore the data:
-            - **Cluster(s)**: Filter by specific clusters.
-            - **Text, Structural, and Weighted Similarity** ranges: Adjust these sliders to filter pairs based on similarity percentages.
+        ### Analyze: Clustered Code Similarity Analysis
 
-        3. **Review Summary Statistics**:  
-        - View summary statistics of the filtered dataset, including **average similarity scores** for each code pair.
-        - Analyze the data with enhanced **visualizations**:
-            - **Scatter Plot**: Visualizes Text Similarity vs. Structural Similarity.
-            - **Histograms**: Show the distribution of similarity metrics (Text, Structural, and Weighted).
+        1. **📤 Upload CSV File**:
+        - Navigate to the **"Analyze"** section of the app.
+        - Use the file uploader to upload the CSV file generated from the Code Similarity Detection and Clustering step.
 
-        4. **Download the Filtered Data**:  
-        - Once you’ve applied filters and explored the data, you can download the filtered dataset.
-        - Click **Download Filtered Data as CSV** from the sidebar.
+        2. **📜 View Uploaded Data**:
+        - Once the CSV file is uploaded, you can view the complete DataFrame within an expander for a clean layout.
+
+        3. **📈 Summary Statistics**:
+        - Expand the summary statistics section to view descriptive statistics of the dataset.
+
+        4. **🔍 Filter Data**:
+        - Use the filter options in the sidebar to refine the data based on cluster selection and similarity score ranges.
+
+        5. **🔑 View Filtered Data**:
+        - After applying filters, the filtered data will be displayed along with an explanation of color coding for similarity scores.
+
+        6. **📉 Visualize Similarity Metrics**:
+        - Explore various visualizations, including scatter plots and histograms for a better understanding of the similarities.
+
+        7. **💾 Download Filtered Data**:
+        - If needed, you can download the filtered data as a CSV file through the download button in the sidebar.
         """)
+
 
     # Expander for Developers
     with st.expander("Developers"):
