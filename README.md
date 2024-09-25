@@ -1,4 +1,4 @@
-# 🚀 Code Similarity Detection and Clustering Tool by Team Orion
+## 🚀 Code Similarity Detection and Clustering Tool by Team Orion
 
 Welcome to the **Python Code Similarity Detection and Clustering Tool** developed by **ORION**. This tool utilizes a hybrid approach that combines AST-based and text-based methodologies with the K-Means algorithm to effectively detect code similarity in Python.
 
@@ -7,35 +7,29 @@ You can access the live application [**here**](https://thesis-roqzofhqframgkykcz
 
 ## 📖 Step-by-Step Guide
 
-## 🚀 App: Code Similarity Detection and Clustering
+## App: Code Similarity Detection and Clustering
 
-### 1. 📝 Enter a Title for the Code Activity:
+1. **📝 Enter a Title for the Code Activity **:
 - Start by entering a title for the current code activity. This will be used as the filename for downloading the results later.
 
----
-
-### 2. 📁 Upload Python Files:
+2. **📁 Upload Python Files **:
 - Upload individual Python files or a ZIP archive containing multiple Python files.
 - Click the **"Upload"** button to process the files.
 
-
-### 3. 🔄 Process Files:
+3. **🔄 Process Files:
 - The app will automatically process the uploaded files, performing similarity analysis and clustering preparation.
 
-
-### 4. 📊 View Similarity Results:
+4. **📊 View Similarity Results **:
 - After the files are processed, you will see the similarity metrics:
   - **Text Similarity**
   - **Structural Similarity**
   - **Weighted Similarity** (a combination of the text and structural similarity)
 
-
-### 5. 🔍 Perform Clustering:
+5. **🔍 Perform Clustering **:
 - The next step is to cluster the files based on the calculated similarities.
 - The app will automatically apply clustering using the **K-Means** algorithm.
 
-
-### 6. 📊 View Results:
+6. **📊 View Results **:
 - Once clustering is complete, various visualizations and metrics will be displayed:
   - **Elbow Method**: Helps you determine the optimal number of clusters.
   - **Best Number of Clusters**: Displays the best number of clusters found.
@@ -45,13 +39,11 @@ You can access the live application [**here**](https://thesis-roqzofhqframgkykcz
   - **Clustered Codes**: Lists the codes grouped by their clusters.
   - **Side-by-Side Code Comparison**: Compare two selected codes within the same cluster.
 
-
-### 7. 💾 Download Clustered Codes:
+7. **💾 Download Clustered Codes **:
 - After reviewing the results, click the **Download CSV** button to save the clustered codes, including:
   - **Code1**, **Code2**
   - **Text Similarity %**, **Structural Similarity %**, and **Weighted Similarity %**
   - **Cluster** (cluster assignment for each pair)
-
 
 ---
 
