@@ -1,4 +1,4 @@
-# Code Similarity Detection and Clustering Tool by Team Orion
+## Code Similarity Detection and Clustering Tool by Team Orion
 
 Welcome to Python Code Similarity Detection and Clustering Tool by ORION. This tool is developed using a hybrid method that combines AST-based and text-based approaches with the K-Means algorithm to detect code similarity in Python.
 
@@ -7,7 +7,7 @@ You can access the live application [here](https://thesis-roqzofhqframgkykcznpcp
 
 ## Step-by-Step Guide
 
-### Part 1: Code Similarity Detection and Clustering
+### App: Code Similarity Detection and Clustering
 
 1. **Upload Python Files**:
    - On the homepage, use the file uploader to upload your Python files or a ZIP archive containing Python files.
