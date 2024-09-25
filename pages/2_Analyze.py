@@ -99,24 +99,21 @@ if st.session_state.df is not None:
 
         # Display filtered dataframe with formatted similarity columns
         st.subheader("Filtered Data")
+
         # Expander for Color Labels Explanation with styled text
         with st.expander("Color Labels Explanation"):
             st.markdown("""
-            <p style='color: #6A9AB0; padding: 5px; border-radius: 5px;'>
-            <strong>Blue</strong>: 0% similarity score or not similar.</p>
+            <p><strong><span style='color: #6A9AB0;'>Blue</span></strong>: 0% similarity score or not similar.</p>
             
-            <p style='color: #557C56; padding: 5px; border-radius: 5px;'>
-            <strong>Green</strong>: 1% - 24% very low similarity score.</p>
+            <p><strong><span style='color: #557C56;'>Green</span></strong>: 1% - 24% very low similarity score.</p>
             
-            <p style='color: #EEDF7A; padding: 5px; border-radius: 5px;'>
-            <strong>Yellow</strong>: 25% - 49% low similarity score.</p>
+            <p><strong><span style='color: #EEDF7A;'>Yellow</span></strong>: 25% - 49% low similarity score.</p>
             
-            <p style='color: #D8A25E; padding: 5px; border-radius: 5px;'>
-            <strong>Orange</strong>: 50% - 74% mid similarity score.</p>
+            <p><strong><span style='color: #D8A25E;'>Orange</span></strong>: 50% - 74% mid similarity score.</p>
             
-            <p style='color: #A04747; padding: 5px; border-radius: 5px;'>
-            <strong>Red</strong>: 75% - 100% high similarity score.</p>
+            <p><strong><span style='color: #A04747;'>Red</span></strong>: 75% - 100% high similarity score.</p>
             """, unsafe_allow_html=True)
+
 
 
         filtered_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']] = filtered_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']].round(2)
