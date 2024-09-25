@@ -45,14 +45,9 @@ def run():
     )
     st.write("---")
     
-    import streamlit as st
-
     # Expander for Instructions
-    with st.expander("📖 Instructions"):
+    with st.expander("Instructions"):
         st.markdown("""
-
-        ## 📖 Step-by-Step Guide
-
         ### App: Code Similarity Detection and Clustering 
 
         ---
@@ -119,8 +114,6 @@ def run():
         7. **💾 Download Filtered Data**:
         - If needed, you can download the filtered data as a CSV file through the download button in the sidebar.
         """)
-
-
     # Expander for Developers
     with st.expander("Developers"):
         st.write("This section is currently empty.")
