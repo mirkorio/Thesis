@@ -8,7 +8,7 @@ import multiprocessing
 
 def main():
     st.set_page_config(
-        page_title="Code Similarity Detection and Clustering",
+        page_title="App",
         page_icon="logo/logo.png",  # Set your logo image as the page icon
     )
     st.markdown("<h3 style='text-align: center;'>Code Similarity Detection and Clustering</h3>", unsafe_allow_html=True)
