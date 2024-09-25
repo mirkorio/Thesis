@@ -7,24 +7,51 @@ You can access the live application [**here**](https://thesis-roqzofhqframgkykcz
 
 ## 📖 Step-by-Step Guide
 
-### Part 1: App - Code Similarity Detection and Clustering
+## 🚀 App: Code Similarity Detection and Clustering
 
-1. **🔄 Upload Python Files**:
-   - On the homepage, use the file uploader to upload your Python files.
+### 1. 📝 Enter a Title for the Code Activity:
+- Start by entering a title for the current code activity. This will be used as the filename for downloading the results later.
 
-2. **⚙️ Process Uploaded Files**:
-   - After uploading, the application will automatically process the files to calculate similarity scores.
+---
 
-3. **📊 View Similarity Data**:
-   - Once processing is complete, you will see the results, including:
-     - **Text Similarity**
-     - **Structural Similarity**
-     - **Weighted Similarity**
-     - You can also interact with the visualization to gain insights of the similarity across different code files.
+### 2. 📁 Upload Python Files:
+- Upload individual Python files or a ZIP archive containing multiple Python files.
+- Click the **"Upload"** button to process the files.
 
 
-4. **📥 Download CSV File**:
-   - After viewing the similarity data, click the download button to export the results as a CSV file.
+### 3. 🔄 Process Files:
+- The app will automatically process the uploaded files, performing similarity analysis and clustering preparation.
+
+
+### 4. 📊 View Similarity Results:
+- After the files are processed, you will see the similarity metrics:
+  - **Text Similarity**
+  - **Structural Similarity**
+  - **Weighted Similarity** (a combination of the text and structural similarity)
+
+
+### 5. 🔍 Perform Clustering:
+- The next step is to cluster the files based on the calculated similarities.
+- The app will automatically apply clustering using the **K-Means** algorithm.
+
+
+### 6. 📊 View Results:
+- Once clustering is complete, various visualizations and metrics will be displayed:
+  - **Elbow Method**: Helps you determine the optimal number of clusters.
+  - **Best Number of Clusters**: Displays the best number of clusters found.
+  - **Scatter Plot**: Visualizes the clustered codes.
+  - **Silhouette Plot**: Shows the silhouette scores for clustering.
+  - **Silhouette Score**: Quantifies how well the clusters are formed.
+  - **Clustered Codes**: Lists the codes grouped by their clusters.
+  - **Side-by-Side Code Comparison**: Compare two selected codes within the same cluster.
+
+
+### 7. 💾 Download Clustered Codes:
+- After reviewing the results, click the **Download CSV** button to save the clustered codes, including:
+  - **Code1**, **Code2**
+  - **Text Similarity %**, **Structural Similarity %**, and **Weighted Similarity %**
+  - **Cluster** (cluster assignment for each pair)
+
 
 ---
 
@@ -54,4 +81,3 @@ You can access the live application [**here**](https://thesis-roqzofhqframgkykcz
 
 ---
 
-Feel free to explore the functionalities of this tool to enhance your understanding of code similarity!
