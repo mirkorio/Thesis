@@ -7,7 +7,9 @@ You can access the live application [**here**](https://thesis-roqzofhqframgkykcz
 
 ## 📖 Step-by-Step Guide
 
-## App: Code Similarity Detection and Clustering
+## App: Code Similarity Detection and Clustering 
+
+---
 
 1. **📝 Enter a Title for the Code Activity **:
 - Start by entering a title for the current code activity. This will be used as the filename for downloading the results later.
@@ -47,7 +49,7 @@ You can access the live application [**here**](https://thesis-roqzofhqframgkykcz
 
 ---
 
-### Part 2: Analyze - Clustered Code Similarity Analysis
+## Analyze : Clustered Code Similarity Analysis
 
 1. **📤 Upload CSV File**:
    - Navigate to the **"Analyze"** section of the app.
