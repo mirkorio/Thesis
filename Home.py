@@ -15,11 +15,12 @@ def run():
     )
     
     # Load the cover photo image
-    cover_photo_image = Image.open("logo/giphy.gif")  # Update with the path to your cover photo image
-   
-    
-    # Display the cover photo image
-    st.image(cover_photo_image, use_column_width=True)
+    gif_url = "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExazM2cnB2NGYyaHNnc2ZyaThtNXFnYXg5NHJ4dHpodHFpeXk0Y2ZweCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/Eq1sxBSFpIBdUyBAsP/giphy.gif"  # Replace with your GIF URL
+
+    # Display the animated GIF with a specified width
+    st.image(gif_url, width=700)  # Adjust the width as needed
+
+
     
     # Display the title
     st.markdown("<h2 style='text-align: center; margin: 20px;'>Python Code Similarity Detection and Clustering Tool</h2>", unsafe_allow_html=True)
