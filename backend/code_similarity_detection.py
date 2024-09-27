@@ -71,6 +71,8 @@ def calculate_weighted_similarity(text_similarity, structural_similarity):
     # Calculate the weighted similarity score
     return (text_similarity * text_weight) + (structural_similarity * structural_weight)
 
+
+# Function to format code
 def format_code(code):
     io_obj = io.StringIO(code)  # Create a StringIO object from the code string
     out = []  # Initialize an empty list to store formatted code
@@ -83,20 +85,19 @@ def format_code(code):
         for tok in tokenize.generate_tokens(io_obj.readline):
             token_type, ttext, (slineno, scol), (elineno, ecol), ltext = tok  # Unpack token properties
 
-            if token_type == tokenize.COMMENT:  # Skip comments
+            # Ignore comments, blank lines, and strings (for docstrings)
+            if token_type in (tokenize.COMMENT, tokenize.STRING) and prev_toktype in (tokenize.INDENT, None):
                 continue
-            if token_type == tokenize.STRING:  # Skip docstrings
-                if prev_toktype == tokenize.INDENT:
-                    continue
+            
+            # Skip blank lines
             if slineno > last_lineno:  # Add new line if current line number is greater than the last
                 last_col = 0
             if scol > last_col:  # Add spaces if the current column is greater than the last
                 out.append(" " * (scol - last_col))
-            out.append(ttext)  # Append the token text to the output list
-            prev_toktype = token_type  # Update the previous token type
-            last_col = ecol  # Update the last column number
-            last_lineno = elineno  # Update the last line number
-
+            out.append(ttext)  # Append token text to output list
+            prev_toktype = token_type  # Update previous token type
+            last_col = ecol  # Update last column number
+            last_lineno = elineno  # Update last line number
     except (tokenize.TokenError, IndentationError) as e:
         print(f"Error tokenizing code: {e}")  # Print an error message if tokenizing fails
         return code  # Return the original code if there's an error
