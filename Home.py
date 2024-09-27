@@ -15,11 +15,12 @@ def run():
     )
     
     # Load the cover photo image
-    cover_photo_image = Image.open("logo/bago.png")  # Update with the path to your cover photo image
-   
-    
-    # Display the cover photo image
-    st.image(cover_photo_image, use_column_width=True)
+    gif_url = "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExazM2cnB2NGYyaHNnc2ZyaThtNXFnYXg5NHJ4dHpodHFpeXk0Y2ZweCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/Eq1sxBSFpIBdUyBAsP/giphy.gif"  # Replace with your GIF URL
+
+    # Display the animated GIF with a specified width
+    st.image(gif_url, width=600)  # Adjust the width as needed
+
+
     
     # Display the title
     st.markdown("<h2 style='text-align: center; margin: 20px;'>Python Code Similarity Detection and Clustering Tool</h2>", unsafe_allow_html=True)
@@ -114,9 +115,82 @@ def run():
         7. **💾 Download Filtered Data**:
         - If needed, you can download the filtered data as a CSV file through the download button in the sidebar.
         """)
+
+
+
+
     # Expander for Developers
     with st.expander("Developers"):
-        st.write("This section is currently empty.")
+        st.markdown(
+        """<div style='text-align: center;'><h3>
+       Team Orion
+        </h3></div>""",
+        unsafe_allow_html=True
+    )
+
+        st.write("---") 
+        col1, col2, col3 = st.columns([1, 1, 1])
+       
+    st.markdown("""
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    """, unsafe_allow_html=True)
+
+
+    with col1:
+        st.image("developers/venn.png", use_column_width=True)
+        st.markdown("<p style='text-align: center;'>Venn P. Delos Santos</p>", unsafe_allow_html=True)
+        st.markdown("""
+            <div style='text-align: center;'>
+                <a href='https://github.com/7ELEVEENN' target='_blank'>
+                    <i class="fa fa-github" style="font-size:30px; margin-right: 10px;"></i>
+                </a>
+                <a href='https://www.facebook.com/0nepiece12' target='_blank'>
+                    <i class="fa fa-facebook" style="font-size:30px; margin-right: 10px;"></i>
+                </a>
+                <a href='mailto:vedelossantos@my.cspc.edu.ph'>
+                    <i class="fa fa-envelope" style="font-size:30px;"></i>
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
+
+    # For col2
+    with col2:
+        st.image("developers/chano.png", use_column_width=True)
+        st.markdown("<p style='text-align: center;'>John Christian M. Gava</p>", unsafe_allow_html=True)
+        st.markdown("""
+            <div style='text-align: center;'>
+                <a href='https://github.com/itsbabychano' target='_blank'>
+                    <i class="fa fa-github" style="font-size:30px; margin-right: 10px;"></i>
+                </a>
+                <a href='https://facebook.com/itsbabychano' target='_blank'>
+                    <i class="fa fa-facebook" style="font-size:30px; margin-right: 10px;"></i>
+                </a>
+                <a href=' mailto:jogava@my.cspc.edu.ph'>
+                    <i class="fa fa-envelope" style="font-size:30px;"></i>
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
+
+    # For col3
+    with col3:
+        st.image("developers/marc.png", use_column_width=True)
+        st.markdown("<p style='text-align: center;'>Marc Christian D. Tumaneng</p>", unsafe_allow_html=True)
+        st.markdown("""
+            <div style='text-align: center;'>
+                <a href='https://github.com/mirkorio' target='_blank'>
+                    <i class="fa fa-github" style="font-size:30px; margin-right: 10px;"></i>
+                </a>
+                <a href='https://www.facebook.com/marcchristian.tumaneng.14' target='_blank'>
+                    <i class="fa fa-facebook" style="font-size:30px; margin-right: 10px;"></i>
+                </a>
+                <a href='mailto:matumaneng@my.cspc.edu.ph'>
+                    <i class="fa fa-envelope" style="font-size:30px;"></i>
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
+
+
+
 
     st.write("---")    
     # Display the images as a footer
