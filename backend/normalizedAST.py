@@ -1,3 +1,4 @@
+#normalizedAST.py
 import ast
 
 # Function to normalize the AST by extracting only the structure and node types
