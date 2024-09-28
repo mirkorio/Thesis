@@ -92,6 +92,14 @@ def main():
     # Show similarity results
     if 'similarity_df' in st.session_state and not st.session_state.similarity_df.empty:
         st.header("Similarity Results")
+        # Similarity Results Expander
+        with st.expander("📝"):
+            st.write("""
+            The similarity results are calculated using a combination of text and structural similarity.
+            Text similarity is measured using Simhash and Hamming distance, while structural similarity
+            is assessed by comparing the Abstract Syntax Trees (AST) of the code files. The weighted similarity
+            is then calculated to give the final or weighted similarity score.
+            """)
 
         # Column renaming mapping
         column_mapping = {
@@ -156,6 +164,14 @@ def main():
         # Display Elbow Chart and Best Number of Clusters
         if st.session_state.clustering_performed and 'elbow_scores' in st.session_state and st.session_state.elbow_scores:
             st.header("Elbow Method")
+            # Elbow Method Expander
+            with st.expander("📝 "):
+                st.write("""
+                The Elbow Method helps in determining the optimal number of clusters for clustering algorithms.
+                It does this by plotting the sum of squared distances from each point to its assigned cluster center
+                (inertia). The 'elbow' is the point where adding more clusters doesn't significantly reduce the inertia,
+                indicating the best number of clusters.
+                """)
             elbow_chart = alt.Chart(pd.DataFrame({
                 'Clusters': list(range(2, len(st.session_state.elbow_scores) + 2)),
                 'Inertia': st.session_state.elbow_scores
@@ -169,6 +185,13 @@ def main():
         # Display Clustering Visualization (Scatter Plot)
         if st.session_state.clustering_performed and 'clustered_data' in st.session_state and not st.session_state.clustered_data.empty:
             st.header("Scatter Plot")
+            # Scatter Plot Expander
+            with st.expander("📝"):
+                st.write("""
+                The scatter plot visualizes the clustered data points in a two-dimensional space. Each point represents
+                a code file, and its position depends on the similarity metrics. The plot helps in understanding the distribution
+                of files across different clusters.
+                """)
 
             # Column renaming mapping for the scatter plot
             scatter_column_mapping = {
@@ -194,6 +217,13 @@ def main():
             # Display Silhouette Plot and Scores
             if 'silhouette_data' in st.session_state and not st.session_state.silhouette_data.empty:
                 st.header("Silhouette Plot")
+                # Silhouette Plot and Score Expander
+                with st.expander("📝 "):
+                    st.write("""
+                    The Silhouette plot and score are used to measure how well each data point lies within its cluster.
+                    A high silhouette score indicates that the data point is well-clustered. The plot provides a visualization
+                    of how close data points are to the clusters they are assigned to, helping assess clustering performance.
+                    """)
                 silhouette_chart = alt.Chart(st.session_state.silhouette_data).mark_bar().encode(
                     x='Silhouette Value',
                     y='Cluster:N',
@@ -205,6 +235,13 @@ def main():
 
             # Display Clustered codes from highest to lowest weighted similarity
             st.header("Clustered Codes")
+            # Clustered Codes Expander
+            with st.expander("📝"):
+                st.write("""
+                Once the clustering process is complete, each code file is assigned to a cluster based on its similarity
+                with other files. The clusters represent groups of code files that share similar characteristics, both textually
+                and structurally. This grouping can help identify patterns and relationships between the code files.
+                """)
 
             # Column renaming mapping for the clustered data display
             cluster_column_mapping = {
