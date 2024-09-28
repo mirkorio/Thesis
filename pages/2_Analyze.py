@@ -41,11 +41,34 @@ def apply_color(val):
 uploaded_file = st.file_uploader("Upload a CSV file", type="csv")
 
 if uploaded_file is not None:
-    # Read the CSV file into a pandas DataFrame
-    df = pd.read_csv(uploaded_file)
+    try:
+        # Try to read the CSV file into a pandas DataFrame
+        df = pd.read_csv(uploaded_file)
 
-    # Store the dataframe in session state
-    st.session_state.df = df
+        # Normalize column names for consistency
+        df.columns = df.columns.str.strip().str.lower()
+
+        # Define required columns in lowercase for checking
+        required_columns = ['code1', 'code2', 'text_similarity_%', 'structural_similarity_%', 'weighted_similarity_%', 'cluster']
+
+        # Check if all required columns are present in the dataframe
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        if missing_columns:
+            # Raise an error if any required columns are missing
+            st.error(f"The uploaded file is missing the following required columns: {', '.join(missing_columns)}, try again.")
+        else:
+            # If no columns are missing, store the dataframe in session state
+            st.session_state.df = df
+            # Display a success message
+            st.success("Data uploaded successfully!")
+
+    except pd.errors.EmptyDataError:
+        st.error("The uploaded file is empty. Please upload a valid CSV file.")
+    except pd.errors.ParserError:
+        st.error("There was an error parsing the CSV file. Please ensure the file is properly formatted.")
+    except Exception as e:
+        # Handle general exceptions
+        st.error(f"An unexpected error occurred: {e}")
 
 if st.session_state.df is not None:
     df = st.session_state.df
@@ -66,9 +89,6 @@ if st.session_state.df is not None:
         }).applymap(apply_color, subset=['weighted_similarity_%'])
         
         st.dataframe(styled_df)
-
-    # Display the detected columns
-    st.write("Detected Columns:", df.columns.tolist())
 
     # Define required columns in lowercase
     required_columns = ['code1', 'code2', 'text_similarity_%', 'structural_similarity_%', 'weighted_similarity_%', 'cluster']
@@ -220,6 +240,14 @@ if st.session_state.df is not None:
             st.write(filtered_overall_summary)
 
         st.subheader('Histograms of Similarity Metrics')
+         # Interpretation for "Histograms of Similarity Metrics"
+        with st.expander("📝"):
+            st.subheader("Interpretation of Histograms")
+            st.write("""
+                - **Text Similarity Histogram**: This histogram shows the distribution of text similarity scores across the dataset. A concentration of bars at higher percentages indicates a greater number of code pairs with similar text.
+                - **Structural Similarity Histogram**: The structural similarity histogram visualizes how similar the structures of the code pairs are. Peaks in the lower ranges suggest more varied structural designs, while higher values indicate structural consistency.
+                - **Weighted Similarity Histogram**: The weighted similarity metric combines both text and structural similarities. A skew toward higher percentages might suggest that most code pairs are both textually and structurally similar. A balanced distribution across all ranges would indicate varied similarities across the dataset.
+            """)
 
         # Define the custom color scale based on the similarity score thresholds
         color_scale = alt.Scale(
@@ -240,16 +268,6 @@ if st.session_state.df is not None:
             )
             
             st.altair_chart(hist_chart, use_container_width=True)
-        
-         # Interpretation for "Histograms of Similarity Metrics"
-        with st.expander("Interpretation of Histograms of Similarity Metrics"):
-            st.subheader("Interpretation of Histograms")
-            st.write("""
-                - **Text Similarity Histogram**: This histogram shows the distribution of text similarity scores across the dataset. A concentration of bars at higher percentages indicates a greater number of code pairs with similar text.
-                - **Structural Similarity Histogram**: The structural similarity histogram visualizes how similar the structures of the code pairs are. Peaks in the lower ranges suggest more varied structural designs, while higher values indicate structural consistency.
-                - **Weighted Similarity Histogram**: The weighted similarity metric combines both text and structural similarities. A skew toward higher percentages might suggest that most code pairs are both textually and structurally similar. A balanced distribution across all ranges would indicate varied similarities across the dataset.
-            """)
-
 
         # Download button for filtered data in the sidebar
         st.sidebar.download_button(
