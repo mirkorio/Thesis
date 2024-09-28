@@ -54,31 +54,39 @@ def main():
     uploaded_files = st.file_uploader("Upload Python files (at least 5)", type=['py'], accept_multiple_files=True)
 
     if uploaded_files:
-        st.write(f"Number of uploaded files: {len(uploaded_files)}")
-        if st.button("Process Files"):
-            with st.spinner("Processing files..."):
-                extracted_files, extracted_files_content = extract_files(uploaded_files)
-                st.session_state.extracted_files_content = extracted_files_content
-                file_pairs = [(extracted_files[i], extracted_files[j]) for i in range(len(extracted_files)) for j in range(i + 1, len(extracted_files))]
+        # Check for duplicate file names
+        file_names = [uploaded_file.name for uploaded_file in uploaded_files]
+        if len(file_names) != len(set(file_names)):
+            st.error("Duplicate file names are not allowed.")
+        elif len(uploaded_files) == 1:
+            st.error("Please upload more files to proceed.")
+        else:
+            st.write(f"Number of uploaded files: {len(uploaded_files)}")
+            if st.button("Process Files"):
+                with st.spinner("Processing files..."):
+                    extracted_files, extracted_files_content = extract_files(uploaded_files)
+                    st.session_state.extracted_files_content = extracted_files_content
+                    file_pairs = [(extracted_files[i], extracted_files[j]) for i in range(len(extracted_files)) for j in range(i + 1, len(extracted_files))]
 
-                pool = multiprocessing.Pool()
-                results = pool.starmap(compare_files, [(pair, st.session_state.extracted_files_content) for pair in file_pairs])
+                    pool = multiprocessing.Pool()
+                    results = pool.starmap(compare_files, [(pair, st.session_state.extracted_files_content) for pair in file_pairs])
 
-                results = [result for result in results if all(result)]
-                pool.close()
-                pool.join()
+                    results = [result for result in results if all(result)]
+                    pool.close()
+                    pool.join()
 
-                try:
-                    # Convert similarity values to percentages and display with 2 decimal places
-                    similarity_df = pd.DataFrame(results, columns=['Code1', 'Code2', 'Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%'])
-                    similarity_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']] = similarity_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']].apply(lambda x: round(x * 100, 2))
-                    st.session_state.similarity_df = similarity_df
+                    try:
+                        # Convert similarity values to percentages and display with 2 decimal places
+                        similarity_df = pd.DataFrame(results, columns=['Code1', 'Code2', 'Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%'])
+                        similarity_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']] = similarity_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']].apply(lambda x: round(x * 100, 2))
+                        st.session_state.similarity_df = similarity_df
 
-                    st.success("Processing complete!")
-                except Exception as e:
-                    st.error(f"An error occurred: {str(e)}")
+                        st.success("Processing complete!")
+                    except Exception as e:
+                        st.error(f"An error occurred: {str(e)}")
     else:
         st.info('Please upload Python files.')
+
 
    
     # Show similarity results
