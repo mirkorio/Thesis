@@ -87,11 +87,8 @@ def format_code(code):
             if token_type == tokenize.COMMENT:  # Ignore single-line and inline comments
                 continue
             if token_type == tokenize.STRING:  # Ignore docstrings
-                # Check if it's a docstring (appearing right after a function, class, or module start)
                 if prev_toktype in {tokenize.INDENT, tokenize.NEWLINE, None}:
-                    # Check if it's a likely docstring, skip it
-                    if ltext.strip().startswith(('"""', "'''")):
-                        continue  
+                    continue  # Skip if it's likely to be a docstring (e.g., after an indent or newline)
 
             if slineno > last_lineno:  # Add a new line if the current line number is greater than the last
                 last_col = 0
@@ -102,12 +99,14 @@ def format_code(code):
             last_col = ecol  # Update the last column number
             last_lineno = elineno  # Update the last line number
 
-        return ''.join(out)  # Join and return the formatted code as a string
-
     except (tokenize.TokenError, IndentationError) as e:
         print(f"Error tokenizing code: {e}")  # Print an error message if tokenizing fails
         return code  # Return the original code if there's an error
 
+    formatted_code = "".join(out)  # Join the formatted code into a single string
+    # Remove extra blank lines and spaces
+    formatted_code = os.linesep.join([s for s in formatted_code.splitlines() if s.strip()])  # Remove extra blank lines
+    return formatted_code  # Return the formatted code
 
 # Function to extract files from upload
 def extract_files(uploaded_files):
