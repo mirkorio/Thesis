@@ -1,4 +1,3 @@
-#code_similarity_detection.py
 import os
 import re
 import ast
@@ -51,6 +50,7 @@ def compare_asts(ast1, ast2):
     similarity_ratio = SequenceMatcher(None, ast_str1, ast_str2).ratio()  # Calculate similarity using SequenceMatcher
     return similarity_ratio  # Return the similarity ratio
 
+
 # Function to calculate structural similarity using AST comparison
 def calculate_structural_similarity(code1, code2):
     ast1 = parse_and_normalize_code(code1)
@@ -71,7 +71,6 @@ def calculate_weighted_similarity(text_similarity, structural_similarity):
     # Calculate the weighted similarity score
     return (text_similarity * text_weight) + (structural_similarity * structural_weight)
 
-
 # Function to format code
 def format_code(code):
     io_obj = io.StringIO(code)  # Create a StringIO object from the code string
@@ -85,11 +84,11 @@ def format_code(code):
         for tok in tokenize.generate_tokens(io_obj.readline):
             token_type, ttext, (slineno, scol), (elineno, ecol), ltext = tok  # Unpack token properties
 
-            # Ignore comments, blank lines, and strings (for docstrings)
-            if token_type in (tokenize.COMMENT, tokenize.STRING) and prev_toktype in (tokenize.INDENT, None):
+            if token_type == tokenize.COMMENT:  # Skip comments
                 continue
-            
-            # Skip blank lines
+            if token_type == tokenize.STRING:  # Skip docstrings
+                if prev_toktype == tokenize.INDENT:
+                    continue
             if slineno > last_lineno:  # Add new line if current line number is greater than the last
                 last_col = 0
             if scol > last_col:  # Add spaces if the current column is greater than the last
