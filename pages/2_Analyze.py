@@ -60,7 +60,7 @@ if uploaded_file is not None:
             # If no columns are missing, store the dataframe in session state
             st.session_state.df = df
             # Display a success message
-            st.success("Data uploaded successfully!")
+            st.success("CSV file data uploaded successfully!")
 
     except pd.errors.EmptyDataError:
         st.error("The uploaded file is empty. Please upload a valid CSV file.")
@@ -121,8 +121,15 @@ if st.session_state.df is not None:
         st.subheader("Filtered Data")
 
         # Expander for Color Labels Explanation with styled text
-        with st.expander("Color Labels Explanation"):
+        with st.expander("Filtering Guide"):
             st.markdown("""
+            **Use the filters in the sidebar to refine the displayed data**:
+            - **Text Similarity Range**: Adjust the slider to specify the range of text similarity percentages you want to include.
+            - **Structural Similarity Range**: Adjust the slider to specify the range of the structural similarity percentages .
+            - **Weighted Similarity Range**: This filter allows you to focus on specific weighted similarity scores.
+
+            **Color Guide for Weighted Similarity**:
+  
             <p><strong><span style='color: #6A9AB0;'>Blue</span></strong>: 0% similarity score or not similar.</p>
             
             <p><strong><span style='color: #557C56;'>Green</span></strong>: 1% - 24% very low similarity score.</p>
@@ -161,9 +168,42 @@ if st.session_state.df is not None:
                 }
 
             filtered_data_summary = count_by_similarity_range(filtered_df)
-            st.write(filtered_data_summary)
+
+            # Convert the summary dictionary to a DataFrame
+            summary_df = pd.DataFrame(list(filtered_data_summary.items()), columns=['Similarity Range', 'Count'])
+
+            # Function to apply background color based on similarity range
+            def apply_row_color(row):
+                if 'Blue' in row['Similarity Range']:
+                    return ['background-color: #6A9AB0'] * len(row)  # Blue
+                elif 'Green' in row['Similarity Range']:
+                    return ['background-color: #557C56'] * len(row)  # Green
+                elif 'Yellow' in row['Similarity Range']:
+                    return ['background-color: #EEDF7A'] * len(row)  # Yellow
+                elif 'Orange' in row['Similarity Range']:
+                    return ['background-color: #D8A25E'] * len(row)  # Orange
+                elif 'Red' in row['Similarity Range']:
+                    return ['background-color: #A04747'] * len(row)  # Red
+                return [''] * len(row)
+
+            # Apply color to the summary table
+            styled_summary_df = summary_df.style.apply(apply_row_color, axis=1)
+
+            # Display the styled DataFrame
+            st.dataframe(styled_summary_df)
+
+
+
         # Enhanced visualizations with custom themes and layering
         st.subheader('Text Similarity & Structural Similarity')
+        # Add an expander explaining the purpose of the plot
+        with st.expander("📝"):
+            st.markdown("""
+            This scatter plot visualizes the relationship between text similarity and structural similarity scores. 
+            Each point represents a pair of code samples, allowing you to identify trends, clusters, 
+            or outliers in the data. The color coding indicates the weighted similarity, providing insights into 
+            how closely related the code samples are in terms of both their text and structure.
+            """)
 
         # Define the custom color scale based on Weighted_Similarity_% thresholds
         color_scale = alt.Scale(
@@ -185,6 +225,15 @@ if st.session_state.df is not None:
 
         # Calculate and display overall similarity for each code
         st.subheader("""Each code's Average Similarity Scores""")
+        # an expander explaining how the scores are calculated
+        with st.expander("📝 "):
+            st.markdown("""
+            Average similarity scores are calculated for each code sample by aggregating the similarity metrics across all comparisons it is involved in. This analysis helps in understanding the general similarity of each code sample with others in the dataset. Additionally, a filter can be applied to focus on specific ranges of similarity scores. The metrics include:
+            - **Text Similarity**: Measures how closely the text of the code samples match.
+            - **Structural Similarity**: Assesses the similarity in the structural design of the code.
+            - **Weighted Similarity**: A combined measure that takes both text and structural similarities into account, providing an overall similarity score.
+            This analysis helps in understanding the general similarity of each code sample with others in the dataset.
+            """)
 
         # Calculate the overall/average similarity metrics for each code
         overall_similarity = df.groupby('Code1').agg(
@@ -223,21 +272,53 @@ if st.session_state.df is not None:
         st.dataframe(styled_filtered_overall_similarity)
 
         # Summary for "Each code's Average Similarity Scores"
-        with st.expander("Summary of Each code's Average Similarity Scores"):
+        with st.expander("Summary of Each Code's Average Similarity Scores"):
 
+            # Calculate the average similarities
             overall_similarity = df.groupby('Code1').agg(
                 average_text_similarity=('Text_Similarity_%', 'mean'),
                 average_structural_similarity=('Structural_Similarity_%', 'mean'),
                 average_weighted_similarity=('Weighted_Similarity_%', 'mean')
             ).reset_index()
 
+            # Round the values to 2 decimal places
             overall_similarity[['average_weighted_similarity', 'average_text_similarity', 'average_structural_similarity']] = overall_similarity[
                 ['average_weighted_similarity', 'average_text_similarity', 'average_structural_similarity']].round(2)
 
+            # Sort by weighted similarity
             overall_similarity = overall_similarity.sort_values(by='average_weighted_similarity', ascending=False)
 
-            filtered_overall_summary = count_by_similarity_range(overall_similarity.rename(columns={'average_weighted_similarity': 'Weighted_Similarity_%'}))
-            st.write(filtered_overall_summary)
+            # Create a summary of counts for each color-coded range
+            def count_by_similarity_range(df):
+                return {
+                    'Blue (0%)': df[df['average_weighted_similarity'] == 0].shape[0],
+                    'Green (1% - 24%)': df[df['average_weighted_similarity'].between(1, 24)].shape[0],
+                    'Yellow (25% - 49%)': df[df['average_weighted_similarity'].between(25, 49)].shape[0],
+                    'Orange (50% - 74%)': df[df['average_weighted_similarity'].between(50, 74)].shape[0],
+                    'Red (75% - 100%)': df[df['average_weighted_similarity'] >= 75].shape[0]
+                }
+
+            # Generate the summary
+            filtered_overall_summary = count_by_similarity_range(overall_similarity)
+
+            # Display the summary in a table with color-coding
+            summary_df = pd.DataFrame(list(filtered_overall_summary.items()), columns=['Range', 'Count'])
+
+            def color_rows(row):
+                if 'Blue' in row['Range']:
+                    return ['background-color: #6A9AB0'] * len(row)
+                elif 'Green' in row['Range']:
+                    return ['background-color: #557C56'] * len(row)
+                elif 'Yellow' in row['Range']:
+                    return ['background-color: #EEDF7A'] * len(row)
+                elif 'Orange' in row['Range']:
+                    return ['background-color: #D8A25E'] * len(row)
+                elif 'Red' in row['Range']:
+                    return ['background-color: #A04747'] * len(row)
+                return [''] * len(row)
+
+            # Apply the color coding and display the table
+            st.dataframe(summary_df.style.apply(color_rows, axis=1))
 
         st.subheader('Histograms of Similarity Metrics')
          # Interpretation for "Histograms of Similarity Metrics"
