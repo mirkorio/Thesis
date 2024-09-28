@@ -51,43 +51,61 @@ def main():
         st.session_state.clustering_performed = False
 
     # File Uploader
-    uploaded_files = st.file_uploader("Upload Python files", type=['py'], accept_multiple_files=True)
+    uploaded_files = st.file_uploader("Upload Python files (minimum 10)", type=['py'], accept_multiple_files=True)
 
     if uploaded_files:
-        st.write(f"Number of uploaded files: {len(uploaded_files)}")
-        if st.button("Process Files"):
-            with st.spinner("Processing files..."):
-                extracted_files, extracted_files_content = extract_files(uploaded_files)
-                st.session_state.extracted_files_content = extracted_files_content
-                file_pairs = [(extracted_files[i], extracted_files[j]) for i in range(len(extracted_files)) for j in range(i + 1, len(extracted_files))]
+        if len(uploaded_files) < 10:
+            st.error("Please upload at least 10 Python files.")
+        else:
+            st.write(f"Number of uploaded files: {len(uploaded_files)}")
+            if st.button("Process Files"):
+                with st.spinner("Processing files..."):
+                    extracted_files, extracted_files_content = extract_files(uploaded_files)
+                    st.session_state.extracted_files_content = extracted_files_content
+                    file_pairs = [(extracted_files[i], extracted_files[j]) for i in range(len(extracted_files)) for j in range(i + 1, len(extracted_files))]
 
-                pool = multiprocessing.Pool()
-                results = pool.starmap(compare_files, [(pair, st.session_state.extracted_files_content) for pair in file_pairs])
+                    pool = multiprocessing.Pool()
+                    results = pool.starmap(compare_files, [(pair, st.session_state.extracted_files_content) for pair in file_pairs])
 
-                results = [result for result in results if all(result)]
-                pool.close()
-                pool.join()
+                    results = [result for result in results if all(result)]
+                    pool.close()
+                    pool.join()
 
-                try:
-                    # Convert similarity values to percentages and display with 2 decimal places
-                    similarity_df = pd.DataFrame(results, columns=['Code1', 'Code2', 'Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%'])
-                    similarity_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']] = similarity_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']].apply(lambda x: round(x * 100, 2))
-                    st.session_state.similarity_df = similarity_df
+                    try:
+                        # Convert similarity values to percentages and display with 2 decimal places
+                        similarity_df = pd.DataFrame(results, columns=['Code1', 'Code2', 'Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%'])
+                        similarity_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']] = similarity_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']].apply(lambda x: round(x * 100, 2))
+                        st.session_state.similarity_df = similarity_df
 
-                    st.success("Processing complete!")
-                except Exception as e:
-                    st.error(f"An error occurred: {str(e)}")
+                        st.success("Processing complete!")
+                    except Exception as e:
+                        st.error(f"An error occurred: {str(e)}")
     else:
         st.info('Please upload Python files.')
 
+   
     # Show similarity results
     if 'similarity_df' in st.session_state and not st.session_state.similarity_df.empty:
         st.header("Similarity Results")
-        
-        # Display dataframe with two decimal places and % sign
-        df_display = st.session_state.similarity_df.copy()
-        df_display[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']] = df_display[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']].applymap(lambda x: f"{x:.2f}%")
+
+        # Column renaming mapping
+        column_mapping = {
+            'Code1': 'Code 1',
+            'Code2': 'Code 2',
+            'Text_Similarity_%': 'Text Similarity %',
+            'Structural_Similarity_%': 'Structural Similarity %',
+            'Weighted_Similarity_%': 'Weighted Similarity %'
+        }
+
+        # Rename columns if they exist in the DataFrame
+        df_display = st.session_state.similarity_df.rename(columns={col: column_mapping[col] for col in st.session_state.similarity_df.columns if col in column_mapping})
+
+        # Convert similarity percentages to strings with 2 decimal places and %
+        df_display[['Text Similarity %', 'Structural Similarity %', 'Weighted Similarity %']] = df_display[['Text Similarity %', 'Structural Similarity %', 'Weighted Similarity %']].applymap(lambda x: f"{x:.2f}%")
+
+        # Display the dataframe
         st.dataframe(df_display)
+
 
         # Clustering
         if st.button("Perform Clustering"):
@@ -129,13 +147,27 @@ def main():
         # Display Clustering Visualization (Scatter Plot)
         if st.session_state.clustering_performed and 'clustered_data' in st.session_state and not st.session_state.clustered_data.empty:
             st.header("Scatter Plot")
-            cluster_chart = alt.Chart(st.session_state.clustered_data).mark_circle(size=60).encode(
-                x='Text_Similarity_%',
-                y='Structural_Similarity_%',
+
+            # Column renaming mapping for the scatter plot
+            scatter_column_mapping = {
+                'Text_Similarity_%': 'Text Similarity %',
+                'Structural_Similarity_%': 'Structural Similarity %',
+                'Weighted_Similarity_%': 'Weighted Similarity %'
+            }
+
+            # Rename columns in clustered_data for display
+            clustered_data_display = st.session_state.clustered_data.rename(columns={col: scatter_column_mapping[col] for col in st.session_state.clustered_data.columns if col in scatter_column_mapping})
+
+            # Create the scatter plot with the renamed columns
+            cluster_chart = alt.Chart(clustered_data_display).mark_circle(size=60).encode(
+                x='Text Similarity %',
+                y='Structural Similarity %',
                 color='Cluster:N',
-                tooltip=['Code1', 'Code2', 'Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']
+                tooltip=['Code1', 'Code2', 'Text Similarity %', 'Structural Similarity %', 'Weighted Similarity %']
             ).interactive()
+
             st.altair_chart(cluster_chart, use_container_width=True)
+
 
             # Display Silhouette Plot and Scores
             if 'silhouette_data' in st.session_state and not st.session_state.silhouette_data.empty:
@@ -151,9 +183,28 @@ def main():
 
             # Display Clustered codes from highest to lowest weighted similarity
             st.header("Clustered Codes")
+
+            # Column renaming mapping for the clustered data display
+            cluster_column_mapping = {
+                'Code1': 'Code 1',
+                'Code2': 'Code 2',
+                'Text_Similarity_%': 'Text Similarity %',
+                'Structural_Similarity_%': 'Structural Similarity %',
+                'Weighted_Similarity_%': 'Weighted Similarity %'
+            }
+
+            # Sort clustered data by Weighted Similarity in descending order
             clustered_data_sorted = st.session_state.clustered_data.sort_values(by='Weighted_Similarity_%', ascending=False)
+
+            # Apply percentage formatting with 2 decimal places
             clustered_data_sorted[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']] = clustered_data_sorted[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']].applymap(lambda x: f"{x:.2f}%")
-            st.dataframe(clustered_data_sorted)
+
+            # Rename columns for display
+            clustered_data_display = clustered_data_sorted.rename(columns={col: cluster_column_mapping[col] for col in clustered_data_sorted.columns if col in cluster_column_mapping})
+
+            # Display the sorted and renamed DataFrame
+            st.dataframe(clustered_data_display)
+
 
             # Side-by-Side Code Comparison
             st.header("Side-by-Side Code Comparison")
