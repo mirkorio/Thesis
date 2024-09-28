@@ -51,35 +51,32 @@ def main():
         st.session_state.clustering_performed = False
 
     # File Uploader
-    uploaded_files = st.file_uploader("Upload Python files (minimum 10)", type=['py'], accept_multiple_files=True)
+    uploaded_files = st.file_uploader("Upload Python files (at least 5)", type=['py'], accept_multiple_files=True)
 
     if uploaded_files:
-        if len(uploaded_files) < 10:
-            st.error("Please upload at least 10 Python files.")
-        else:
-            st.write(f"Number of uploaded files: {len(uploaded_files)}")
-            if st.button("Process Files"):
-                with st.spinner("Processing files..."):
-                    extracted_files, extracted_files_content = extract_files(uploaded_files)
-                    st.session_state.extracted_files_content = extracted_files_content
-                    file_pairs = [(extracted_files[i], extracted_files[j]) for i in range(len(extracted_files)) for j in range(i + 1, len(extracted_files))]
+        st.write(f"Number of uploaded files: {len(uploaded_files)}")
+        if st.button("Process Files"):
+            with st.spinner("Processing files..."):
+                extracted_files, extracted_files_content = extract_files(uploaded_files)
+                st.session_state.extracted_files_content = extracted_files_content
+                file_pairs = [(extracted_files[i], extracted_files[j]) for i in range(len(extracted_files)) for j in range(i + 1, len(extracted_files))]
 
-                    pool = multiprocessing.Pool()
-                    results = pool.starmap(compare_files, [(pair, st.session_state.extracted_files_content) for pair in file_pairs])
+                pool = multiprocessing.Pool()
+                results = pool.starmap(compare_files, [(pair, st.session_state.extracted_files_content) for pair in file_pairs])
 
-                    results = [result for result in results if all(result)]
-                    pool.close()
-                    pool.join()
+                results = [result for result in results if all(result)]
+                pool.close()
+                pool.join()
 
-                    try:
-                        # Convert similarity values to percentages and display with 2 decimal places
-                        similarity_df = pd.DataFrame(results, columns=['Code1', 'Code2', 'Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%'])
-                        similarity_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']] = similarity_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']].apply(lambda x: round(x * 100, 2))
-                        st.session_state.similarity_df = similarity_df
+                try:
+                    # Convert similarity values to percentages and display with 2 decimal places
+                    similarity_df = pd.DataFrame(results, columns=['Code1', 'Code2', 'Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%'])
+                    similarity_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']] = similarity_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']].apply(lambda x: round(x * 100, 2))
+                    st.session_state.similarity_df = similarity_df
 
-                        st.success("Processing complete!")
-                    except Exception as e:
-                        st.error(f"An error occurred: {str(e)}")
+                    st.success("Processing complete!")
+                except Exception as e:
+                    st.error(f"An error occurred: {str(e)}")
     else:
         st.info('Please upload Python files.')
 
@@ -106,34 +103,47 @@ def main():
         # Display the dataframe
         st.dataframe(df_display)
 
-
         # Clustering
         if st.button("Perform Clustering"):
             with st.spinner("Performing clustering..."):
-                # Calculate the elbow method
                 clusterer = CodeClusterer(num_clusters=st.session_state.best_num_clusters)
                 clusterer.load_data(st.session_state.similarity_df)
-                clusterer.calculate_elbow(max_clusters=10)
-                st.session_state.elbow_scores = clusterer.elbow_scores
-                st.session_state.best_num_clusters = find_elbow_point(clusterer.elbow_scores)
-
-                clusterer = CodeClusterer(num_clusters=st.session_state.best_num_clusters)
-                clusterer.load_data(st.session_state.similarity_df)
-
+                
                 try:
-                    features = clusterer.cluster_codes()
-                    st.session_state.clustered_data = clusterer.get_clustered_data()
-                    st.session_state.silhouette_avg = clusterer.silhouette_avg
-                    st.session_state.silhouette_data = clusterer.get_silhouette_data(features)
-                    st.session_state.clustering_performed = True
+                    # Ensure that number of clusters doesn't exceed the number of samples
+                    max_clusters_possible = len(st.session_state.similarity_df)
+                    if max_clusters_possible < 2:
+                        st.warning("Clustering cannot be performed because there are not enough distinct samples.")
+                    else:
+                        # Limit max_clusters based on number of samples
+                        max_clusters = min(10, max_clusters_possible)
+                        
+                        # Calculate the elbow method with limited clusters
+                        clusterer.calculate_elbow(max_clusters=max_clusters)
+                        st.session_state.elbow_scores = clusterer.elbow_scores
+                        st.session_state.best_num_clusters = find_elbow_point(clusterer.elbow_scores)
 
-                    st.success("Clustering complete!")
+                        # Recheck if the best number of clusters is within the valid range
+                        if st.session_state.best_num_clusters > max_clusters_possible:
+                            st.warning(f"Clustering cannot be performed. The number of clusters {st.session_state.best_num_clusters} exceeds the number of samples.")
+                        else:
+                            # Proceed with clustering if everything is valid
+                            clusterer = CodeClusterer(num_clusters=st.session_state.best_num_clusters)
+                            clusterer.load_data(st.session_state.similarity_df)
+
+                            features = clusterer.cluster_codes()
+                            st.session_state.clustered_data = clusterer.get_clustered_data()
+                            st.session_state.silhouette_avg = clusterer.silhouette_avg
+                            st.session_state.silhouette_data = clusterer.get_silhouette_data(features)
+                            st.session_state.clustering_performed = True
+
+                            st.success("Clustering complete!")
                 except ValueError as e:
-                    # Check for the specific error regarding single cluster formation
-                    if str(e) == "Number of labels is 1. Valid values are 2 to n_samples - 1 (inclusive)":
-                        st.warning("Clustering cannot be performed because all files have the same similarity scores, resulting in only one cluster. Clustering requires at least two distinct groups to work.")
+                    if "Number of labels is 1" in str(e):
+                        st.warning("This implies that all uploaded files are identical, resulting in only one cluster. Clustering requires at least two distinct groups to work.")
                     else:
                         st.error(f"Error clustering data: {str(e)}")
+
 
         # Display Elbow Chart and Best Number of Clusters
         if st.session_state.clustering_performed and 'elbow_scores' in st.session_state and st.session_state.elbow_scores:
