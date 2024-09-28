@@ -129,7 +129,11 @@ def main():
 
                     st.success("Clustering complete!")
                 except ValueError as e:
-                    st.error(f"Error clustering data: {str(e)}")
+                    # Check for the specific error regarding single cluster formation
+                    if str(e) == "Number of labels is 1. Valid values are 2 to n_samples - 1 (inclusive)":
+                        st.warning("Clustering cannot be performed because all files have the same similarity scores, resulting in only one cluster. Clustering requires at least two distinct groups to work.")
+                    else:
+                        st.error(f"Error clustering data: {str(e)}")
 
         # Display Elbow Chart and Best Number of Clusters
         if st.session_state.clustering_performed and 'elbow_scores' in st.session_state and st.session_state.elbow_scores:
