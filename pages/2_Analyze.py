@@ -225,51 +225,61 @@ if st.session_state.df is not None:
 
         # Calculate and display overall similarity for each code
         st.subheader("""Each code's Average Similarity Scores""")
-        # an expander explaining how the scores are calculated
+
+        # Expander explaining how the scores are calculated
         with st.expander("📝 "):
             st.markdown("""
             Average similarity scores are calculated for each code sample by aggregating the similarity metrics across all comparisons it is involved in. This analysis helps in understanding the general similarity of each code sample with others in the dataset. Additionally, a filter can be applied to focus on specific ranges of similarity scores. The metrics include:
             - **Text Similarity**: Measures how closely the text of the code samples match.
             - **Structural Similarity**: Assesses the similarity in the structural design of the code.
             - **Weighted Similarity**: A combined measure that takes both text and structural similarities into account, providing an overall similarity score.
-            This analysis helps in understanding the general similarity of each code sample with others in the dataset.
             """)
 
-        # Calculate the overall/average similarity metrics for each code
+        # Calculate overall/average similarity for each code
         overall_similarity = df.groupby('Code1').agg(
             average_text_similarity=('Text_Similarity_%', 'mean'),
             average_structural_similarity=('Structural_Similarity_%', 'mean'),
             average_weighted_similarity=('Weighted_Similarity_%', 'mean')
         ).reset_index()
 
-        # Round the results for better display
+        # Handle missing data by filling NaNs with 0
+        overall_similarity.fillna(0, inplace=True)
+
+        # Round results for display
         overall_similarity[['average_weighted_similarity', 'average_text_similarity', 'average_structural_similarity']] = overall_similarity[
             ['average_weighted_similarity', 'average_text_similarity', 'average_structural_similarity']].round(2)
 
-        # Sort the DataFrame from highest to lowest average_weighted_similarity
-        overall_similarity = overall_similarity.sort_values(by='average_weighted_similarity', ascending=False)
-
-        # Sidebar filter for overall similarity
-        weighted_similarity_range = st.sidebar.slider('Average Weighted Similarity Range (%)', 0.0, 100.0, (0.0, 100.0))
-
-        # Filter the overall similarity DataFrame based on user selection
-        filtered_overall_similarity = overall_similarity[(overall_similarity['average_weighted_similarity'].between(*weighted_similarity_range)) ]
-
-        # Apply the existing apply_color function to color-code the similarity scores
-        styled_filtered_overall_similarity = filtered_overall_similarity.style.applymap(
-            apply_color, 
-            subset=['average_weighted_similarity']
-        )
-
-        # Add percentage formatting after applying the color
-        styled_filtered_overall_similarity = styled_filtered_overall_similarity.format({
-            'average_weighted_similarity': '{:.2f}%',
-            'average_text_similarity': '{:.2f}%',
-            'average_structural_similarity': '{:.2f}%'
+        # Rename columns for better appearance
+        overall_similarity = overall_similarity.rename(columns={
+            'Code1': 'Code 1',
+            'average_text_similarity': 'Average Text Similarity %',
+            'average_structural_similarity': 'Average Structural Similarity %',
+            'average_weighted_similarity': 'Average Weighted Similarity %'
         })
 
-        # Display the styled filtered dataframe
+        # Sort by weighted similarity (highest to lowest)
+        overall_similarity = overall_similarity.sort_values(by='Average Weighted Similarity %', ascending=False)
+
+        # Sidebar filter for weighted similarity range
+        weighted_similarity_range = st.sidebar.slider('Average Weighted Similarity Range (%)', 0.0, 100.0, (0.0, 100.0))
+
+        # Filter based on user-selected range
+        filtered_overall_similarity = overall_similarity[
+            overall_similarity['Average Weighted Similarity %'].between(*weighted_similarity_range)
+        ]
+
+        # Apply color-coding and percentage formatting
+        styled_filtered_overall_similarity = filtered_overall_similarity.style.applymap(
+            apply_color, subset=['Average Weighted Similarity %']
+        ).format({
+            'Average Weighted Similarity %': '{:.2f}%',
+            'Average Text Similarity %': '{:.2f}%',
+            'Average Structural Similarity %': '{:.2f}%'
+        })
+
+        # Display the styled and filtered dataframe
         st.dataframe(styled_filtered_overall_similarity)
+
 
         # Summary for "Each code's Average Similarity Scores"
         with st.expander("Summary of Each Code's Average Similarity Scores"):
