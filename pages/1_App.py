@@ -273,10 +273,10 @@ def main():
                 st.write("""
                 In the context of computer programming, common forms of code plagiarism include:
 
-                1. **Complete copy-pasting** of code.
+                1. **Complete copy-pasting** of code - 100% Weighted Similarity.
                 2. **Altering comments** within the code.
-                3. **Changing identifiers** like variable names.
-                4. **Rearranging the code sequence** without changing functionality.
+                3. **Changing identifiers** like variable names - Low Text Similarity but High Structural Similarity.
+                4. **Rearranging the code sequence** without changing functionality - Low Structural Similarity but Hight Text Similarity.
                 
                 However, if an individual replicates another’s code but performs extensive modifications and restructuring while maintaining the function’s integrity, this action should not be classified as plagiarism.
                 """)
