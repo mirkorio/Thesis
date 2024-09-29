@@ -5,6 +5,7 @@ import altair as alt
 from backend.code_similarity_detection import extract_files, compare_files, sanitize_title
 from backend.code_clustering import CodeClusterer, find_elbow_point
 import os
+import difflib
 import multiprocessing
 
 def main():
@@ -305,23 +306,53 @@ def main():
 
                     # Create columns for side-by-side display
                     col1, col2 = st.columns(2)
+                   
+                    def apply_color_style(val):
+                        """
+                        Return color style string based on similarity percentage for the numeric values.
+                        """
+                        if val >= 75:
+                            color = 'color: #FF5C5C; font-weight: bold;'  # Soft red
+                        elif 50 <= val < 75:
+                            color = 'color: #FFA500; font-weight: bold;'  # Orange
+                        elif 25 <= val < 50:
+                            color = 'color: #FFD700; font-weight: bold;'  # Yellow
+                        elif 1 <= val < 25:
+                            color = 'color: #32CD32; font-weight: bold;'  # Green
+                        else:
+                            color = 'color: #4682B4; font-weight: bold;'  # Blue
+                        return color
+
+                    # Function to create the HTML details for each code
+                    def create_code_details(file_name, text_sim, struct_sim, weight_sim):
+                        return f"""
+                        **File Name:** {file_name}<br>
+                        Text Similarity: <span style='{apply_color_style(text_sim)}'>{text_sim:.2f}%</span><br>
+                        Structural Similarity: <span style='{apply_color_style(struct_sim)}'>{struct_sim:.2f}%</span><br>
+                        Weighted Similarity: <span style='{apply_color_style(weight_sim)}'>{weight_sim:.2f}%</span>
+                        """
+
+                    # Create the details for Code 1 and Code 2
+                    code1_details = create_code_details(code1, text_similarity, structural_similarity, weighted_similarity)
+                    code2_details = create_code_details(code2, text_similarity, structural_similarity, weighted_similarity)
+
+                    # Display with two columns
+                    col1, col2 = st.columns(2)
 
                     with col1:
-                        st.markdown("### Code 1 Details")
-                        st.write(f"**File Name:** {code1}")
-                        st.write(f"**Text Similarity:** {text_similarity:.2f}%")
-                        st.write(f"**Structural Similarity:** {structural_similarity:.2f}%")
-                        st.write(f"**Weighted Similarity:** {weighted_similarity:.2f}%")
+                        st.markdown("### Code 1")
+                        with st.expander("Show Details", expanded=True):
+                            # Display the file details for Code 1 inside the expander
+                            st.markdown(code1_details, unsafe_allow_html=True)
                         st.code(code1_content, language='python')
 
                     with col2:
-                        st.markdown("### Code 2 Details")
-                        st.write(f"**File Name:** {code2}")
-                        st.write(f"**Text Similarity:** {text_similarity:.2f}%")
-                        st.write(f"**Structural Similarity:** {structural_similarity:.2f}%")
-                        st.write(f"**Weighted Similarity:** {weighted_similarity:.2f}%")
+                        st.markdown("### Code 2")
+                        with st.expander("Show Details", expanded=True):
+                            # Display the file details for Code 2 inside the expander
+                            st.markdown(code2_details, unsafe_allow_html=True)
                         st.code(code2_content, language='python')
-                        
+                                                                        
             # Display the download button in the sidebar only if clustering is done
             with st.sidebar:
                 if st.session_state.clustering_performed and not st.session_state.clustered_data.empty:
@@ -336,4 +367,3 @@ def main():
                     )
 if __name__ == "__main__":
     main()
-
