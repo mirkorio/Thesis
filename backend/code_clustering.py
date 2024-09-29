@@ -1,4 +1,3 @@
-#code_clustering.py
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score, davies_bouldin_score, silhouette_samples
