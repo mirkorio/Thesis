@@ -118,6 +118,7 @@ if st.session_state.df is not None:
         ]
 
         # Display filtered dataframe with formatted similarity columns
+        # Subheader for the filtered data section
         st.subheader("Filtered Data")
 
         # Expander for Color Labels Explanation with styled text
@@ -125,11 +126,11 @@ if st.session_state.df is not None:
             st.markdown("""
             **Use the filters in the sidebar to refine the displayed data**:
             - **Text Similarity Range**: Adjust the slider to specify the range of text similarity percentages you want to include.
-            - **Structural Similarity Range**: Adjust the slider to specify the range of the structural similarity percentages .
+            - **Structural Similarity Range**: Adjust the slider to specify the range of the structural similarity percentages.
             - **Weighted Similarity Range**: This filter allows you to focus on specific weighted similarity scores.
 
             **Color Guide for Weighted Similarity**:
-  
+        
             <p><strong><span style='color: #6A9AB0;'>Blue</span></strong>: 0% similarity score or not similar.</p>
             
             <p><strong><span style='color: #557C56;'>Green</span></strong>: 1% - 24% very low similarity score.</p>
@@ -141,38 +142,62 @@ if st.session_state.df is not None:
             <p><strong><span style='color: #A04747;'>Red</span></strong>: 75% - 100% high similarity score.</p>
             """, unsafe_allow_html=True)
 
+        # Rename the columns for better appearance in the table
+        filtered_df = filtered_df.rename(columns={
+            'Code1': 'Code 1',
+            'Code2': 'Code 2',
+            'Text_Similarity_%': 'Text Similarity %',
+            'Structural_Similarity_%': 'Structural Similarity %',
+            'Weighted_Similarity_%': 'Weighted Similarity %'
+        })
 
+        # Rounding the values for better display
+        filtered_df[['Text Similarity %', 'Structural Similarity %', 'Weighted Similarity %']] = filtered_df[
+            ['Text Similarity %', 'Structural Similarity %', 'Weighted Similarity %']
+        ].round(2)
 
-        filtered_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']] = filtered_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']].round(2)
-
+        # Styling and formatting the filtered DataFrame
         styled_filtered_df = filtered_df.style.format({
-            'Text_Similarity_%': '{:.2f}%',
-            'Structural_Similarity_%': '{:.2f}%',
-            'Weighted_Similarity_%': '{:.2f}%'
-        }).applymap(apply_color, subset=['Weighted_Similarity_%'])
+            'Text Similarity %': '{:.2f}%',
+            'Structural Similarity %': '{:.2f}%',
+            'Weighted Similarity %': '{:.2f}%'
+        }).applymap(apply_color, subset=['Weighted Similarity %'])
 
+        # Displaying the styled DataFrame in Streamlit
         st.dataframe(styled_filtered_df)
+
 
          # Summary for "Filtered Data"
         with st.expander("Summary of Filtered Data"):
-            filtered_df[['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']] = filtered_df[
-                ['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']].round(2)
+            # Rename the columns for consistency and better display
+            filtered_df = filtered_df.rename(columns={
+                'Text_Similarity_%': 'Text Similarity %',
+                'Structural_Similarity_%': 'Structural Similarity %',
+                'Weighted_Similarity_%': 'Weighted Similarity %'
+            })
 
+            # Round the similarity columns to two decimal places
+            filtered_df[['Text Similarity %', 'Structural Similarity %', 'Weighted Similarity %']] = filtered_df[
+                ['Text Similarity %', 'Structural Similarity %', 'Weighted Similarity %']
+            ].round(2)
+
+            # Function to count how many entries fall into each similarity range
             def count_by_similarity_range(df):
                 return {
-                    'Blue (0%)': df[df['Weighted_Similarity_%'] == 0].shape[0],
-                    'Green (1% - 24%)': df[df['Weighted_Similarity_%'].between(1, 24)].shape[0],
-                    'Yellow (25% - 49%)': df[df['Weighted_Similarity_%'].between(25, 49)].shape[0],
-                    'Orange (50% - 74%)': df[df['Weighted_Similarity_%'].between(50, 74)].shape[0],
-                    'Red (75% - 100%)': df[df['Weighted_Similarity_%'] >= 75].shape[0]
+                    'Blue (0%)': df[df['Weighted Similarity %'] == 0].shape[0],
+                    'Green (1% - 24%)': df[df['Weighted Similarity %'].between(1, 24)].shape[0],
+                    'Yellow (25% - 49%)': df[df['Weighted Similarity %'].between(25, 49)].shape[0],
+                    'Orange (50% - 74%)': df[df['Weighted Similarity %'].between(50, 74)].shape[0],
+                    'Red (75% - 100%)': df[df['Weighted Similarity %'] >= 75].shape[0]
                 }
 
+            # Generate a summary of the filtered data based on similarity ranges
             filtered_data_summary = count_by_similarity_range(filtered_df)
 
             # Convert the summary dictionary to a DataFrame
             summary_df = pd.DataFrame(list(filtered_data_summary.items()), columns=['Similarity Range', 'Count'])
 
-            # Function to apply background color based on similarity range
+            # Function to apply background colors to the summary rows based on the similarity range
             def apply_row_color(row):
                 if 'Blue' in row['Similarity Range']:
                     return ['background-color: #6A9AB0'] * len(row)  # Blue
@@ -186,16 +211,16 @@ if st.session_state.df is not None:
                     return ['background-color: #A04747'] * len(row)  # Red
                 return [''] * len(row)
 
-            # Apply color to the summary table
+            # Apply row colors based on similarity ranges
             styled_summary_df = summary_df.style.apply(apply_row_color, axis=1)
 
-            # Display the styled DataFrame
+            # Display the styled summary DataFrame
             st.dataframe(styled_summary_df)
 
-
-
         # Enhanced visualizations with custom themes and layering
+
         st.subheader('Text Similarity & Structural Similarity')
+
         # Add an expander explaining the purpose of the plot
         with st.expander("📝"):
             st.markdown("""
@@ -205,23 +230,33 @@ if st.session_state.df is not None:
             how closely related the code samples are in terms of both their text and structure.
             """)
 
-        # Define the custom color scale based on Weighted_Similarity_% thresholds
+        # Rename columns for consistency and better readability in the plot
+        filtered_df = filtered_df.rename(columns={
+            'Text_Similarity_%': 'Text Similarity %',
+            'Structural_Similarity_%': 'Structural Similarity %',
+            'Weighted_Similarity_%': 'Weighted Similarity %'
+        })
+
+        # Define the custom color scale based on 'Weighted Similarity %' thresholds
         color_scale = alt.Scale(
             domain=[0, 1, 25, 50, 75, 100],
             range=['#6A9AB0', '#557C56', '#EEDF7A', '#D8A25E', '#A04747']
         )
 
+        # Create a scatter plot with renamed columns
         scatter_plot = alt.Chart(filtered_df).mark_circle(size=60).encode(
-            x=alt.X('Text_Similarity_%', title='Text Similarity (%)'),
-            y=alt.Y('Structural_Similarity_%', title='Structural Similarity (%)'),
-            color=alt.Color('Weighted_Similarity_%', scale=color_scale, legend=alt.Legend(title="Weighted Similarity (%)")),
-            tooltip=['Code1', 'Code2', 'Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']
+            x=alt.X('Text Similarity %', title='Text Similarity (%)'),
+            y=alt.Y('Structural Similarity %', title='Structural Similarity (%)'),
+            color=alt.Color('Weighted Similarity %', scale=color_scale, legend=alt.Legend(title="Weighted Similarity (%)")),
+            tooltip=['Code 1', 'Code 2', 'Text Similarity %', 'Structural Similarity %', 'Weighted Similarity %']
         ).interactive().properties(
             width=800,
             height=400
         )
 
+        # Display the scatter plot
         st.altair_chart(scatter_plot, use_container_width=True)
+
 
         # Calculate and display overall similarity for each code
         st.subheader("""Each code's Average Similarity Scores""")
@@ -331,7 +366,8 @@ if st.session_state.df is not None:
             st.dataframe(summary_df.style.apply(color_rows, axis=1))
 
         st.subheader('Histograms of Similarity Metrics')
-         # Interpretation for "Histograms of Similarity Metrics"
+
+        # Interpretation for "Histograms of Similarity Metrics"
         with st.expander("📝"):
             st.subheader("Interpretation of Histograms")
             st.write("""
@@ -340,24 +376,32 @@ if st.session_state.df is not None:
                 - **Weighted Similarity Histogram**: The weighted similarity metric combines both text and structural similarities. A skew toward higher percentages might suggest that most code pairs are both textually and structurally similar. A balanced distribution across all ranges would indicate varied similarities across the dataset.
             """)
 
+        # Rename columns for consistency and better readability in the histograms
+        filtered_df = filtered_df.rename(columns={
+            'Text_Similarity_%': 'Text Similarity %',
+            'Structural_Similarity_%': 'Structural Similarity %',
+            'Weighted_Similarity_%': 'Weighted Similarity %'
+        })
+
         # Define the custom color scale based on the similarity score thresholds
         color_scale = alt.Scale(
             domain=[0, 1, 25, 50, 75, 100],
             range=['#6A9AB0', '#557C56', '#EEDF7A', '#D8A25E', '#A04747']  # Blue, Green, Yellow, Orange, Red
         )
 
-        for column in ['Text_Similarity_%', 'Structural_Similarity_%', 'Weighted_Similarity_%']:
+        # Create histograms for each similarity metric
+        for column in ['Text Similarity %', 'Structural Similarity %', 'Weighted Similarity %']:
             hist_chart = alt.Chart(filtered_df).mark_bar().encode(
-                alt.X(column, bin=alt.Bin(maxbins=30), title=column.replace('_', ' ').title()),
+                alt.X(column, bin=alt.Bin(maxbins=30), title=column),
                 y=alt.Y('count()', title='Frequency'),
                 color=alt.Color(column, scale=color_scale, legend=None),  # Apply color based on similarity score
                 tooltip=[column, 'count()']
             ).properties(
                 width=300,
                 height=300,
-                title=f'Distribution of {column.replace("_", " ").title()}'
+                title=f'Distribution of {column}'
             )
-            
+
             st.altair_chart(hist_chart, use_container_width=True)
 
         # Download button for filtered data in the sidebar
@@ -367,7 +411,6 @@ if st.session_state.df is not None:
             file_name='filtered_data.csv',
             mime='text/csv'
         )
-
     else:
         st.error('The uploaded file does not contain the required columns.')
 else:
