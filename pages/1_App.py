@@ -279,7 +279,7 @@ def main():
                 4. **Rearranging the code sequence** without changing code text(variable, identifier names, etc.) - Low Structural Similarity but Hight Text Similarity.
                 
                 
-When an individual reproduces another's code but introduces significant modifications and restructures it while maintaining the core functionality, it should not be considered plagiarism. In such cases, the resulting similarity score is likely to be low.
+                When an individual reproduces another's code but introduces significant modifications and restructures it while maintaining the core functionality, it should not be considered plagiarism. In such cases, the resulting similarity score is likely to be low.
                 """)
 
             code_pairs = st.session_state.similarity_df[['Code1', 'Code2']].apply(tuple, axis=1).tolist()
