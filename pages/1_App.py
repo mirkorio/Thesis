@@ -15,7 +15,7 @@ def main():
     st.markdown("<h3 style='text-align: center;'>Code Similarity Detection and Clustering</h3>", unsafe_allow_html=True)
 
     st.markdown("""
-    This application allows you to detect and analyze code similarity by uploading Python files. 
+    This application allows you to detect and cluster codes by uploading your python files. 
     Get started by uploading your files and exploring clustered similarity results, visualizations, and detailed comparisons.
     """)
 
