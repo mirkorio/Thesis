@@ -137,7 +137,7 @@ if st.session_state.df is not None:
             
             <p><strong><span style='color: #EEDF7A;'>Yellow</span></strong>: 25% - 49% low similarity score.</p>
             
-            <p><strong><span style='color: #D8A25E;'>Orange</span></strong>: 50% - 74% mid similarity score.</p>
+            <p><strong><span style='color: #D8A25E;'>Orange</span></strong>: 50% - 74% mid-range similarity score.</p>
             
             <p><strong><span style='color: #A04747;'>Red</span></strong>: 75% - 100% high similarity score.</p>
             """, unsafe_allow_html=True)
